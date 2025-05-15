@@ -6,30 +6,28 @@ import { syllable } from "syllable"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const filePath = path.join(__dirname, '../extracted_data/text/politic_data_options_Title.json');
+const filePath = path.join(__dirname, '../extracted_data/text/shopping_data_options.json');
 
 const raw = fs.readFileSync(filePath, 'utf-8');
 const data = JSON.parse(raw);
 
-const textArray = data.map(entry => entry.text);
+const textArray = data.map(entry => entry.title);
 
 
 export function checkTextComplexity(Array) {
 
-
     const totalwords = countWordsinSentence(Array);
-    const totalSentences = countSentencesInText(Array);
     const averageSyllables = averageSyllablesPerWord(Array);
 
-    Testsyll(Array);
+    /*Testsyll(Array);
     console.log("TotalW: ", totalwords)
     console.log("TotalS: ", totalSentences)
-    console.log("averageSyl: ", averageSyllables)
+    console.log("averageSyl: ", averageSyllables)*/
 
-    const averageWordsPerSentence = totalSentences === 0 ? totalwords : totalwords / totalSentences;
+    const averageWordsPerSentence = totalwords / 1;
 
     const FleschReadingEase = 206.835 - (1.015 * averageWordsPerSentence) - (84.6 * averageSyllables)
-    //const FleschReadingEase = (0.39*averageWordsPerSentence) + (11.8*averageSyllables) - 15.9
+
     console.log("FleschReadingEase", FleschReadingEase.toFixed(2))
 
     if (FleschReadingEase > 100) {
@@ -56,37 +54,50 @@ export function checkTextComplexity(Array) {
 }
 
 function countWordsinSentence(Array) {
-    const arrayToString = Array.join("");
-    const totalWords = arrayToString.trim().replace(/[.,!?;:()"]/g, '').split(/\s+/).filter(word => word.length > 0);
-    return totalWords.length;
+    const countedWords = Array.reduce((count, sentence) => {
+        const reduceSpecialCharacter = sentence.trim().replace(/[.,!?;:()"]/g, '');
+        const words = reduceSpecialCharacter.split(/\s+/).filter(word => word.length > 0);
+        return count + words.length
+    }, 0)
+
+    return countedWords;
 }
 
-function countSentencesInText(Array) {
-    const arrayToString = Array.join("");
-    const regex = /[.!?]/;
-    const sentenceCount = arrayToString.split(regex);
-    return sentenceCount.length - 1
+function countSentence(Array){
+    const sentenceString = /[.,!?;:()"\-]/g;
+    const countSentence = 0;
+    Array.forEach(element => {
+        const matches = element.match(sentenceString)
+        if (matches){
+            countSentence += matches.length
+        }
+    })
 }
 
 function averageSyllablesPerWord(Array) {
-    const arrayToString = Array.join("");
-    const textArray = arrayToString.trim().split(/\s+/).filter(word => word.length > 0);
-    let countAllSyllable = 0;
+    let allWords = [];
+    let allSyllables = 0;
 
-    for (let i = 0; i < textArray.length; i++) {
-        countAllSyllable += syllable(textArray[i])
+    Array.forEach(sentence => {
+        const words = sentence.replace(/[.,!?;:()"]/g, '').split(/\s+/).filter(word => word.length > 0);
+        allWords.push(...words)
+    })
+
+
+    for (let i = 0; i < allWords.length; i++) {
+        allSyllables += syllable(allWords[i]);
     }
 
-    return countAllSyllable / textArray.length
+    return allWords.length > 0 ? allSyllables / allWords.length : 0;
 }
 
-function Testsyll(text) {
+/*function Testsyll(text) {
 
     text.forEach(element => {
         console.log("JOOO", syllable(element))
     });
-    
-}
+
+}*/
 
 export function checkNumberOfIAOptions(cards) {
 
@@ -105,4 +116,3 @@ export function checkNumberOfIAOptions(cards) {
 
 checkNumberOfIAOptions(textArray);
 checkTextComplexity(textArray);
-Testsyll(textArray);
