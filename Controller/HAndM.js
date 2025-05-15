@@ -9,7 +9,7 @@ const launchOptions = {
 const browser = await puppeteer.launch(launchOptions);
 const page = await browser.newPage();
 
-await page.goto('https://www2.hm.com/en_us/'); 
+await page.goto('https://www2.hm.com/en_gb/'); 
 await page.waitForSelector(".b2ce26 > li > a");
 
  const _items = await page.$$eval(".b2ce26 > li > a", (elements) => { //text von .d00fe8 element holen
@@ -21,7 +21,7 @@ const dataItems = _items.map(item => ({ //ins richtige format bringen
 }));
 
 
-const _menuItems = await page.$$eval('.d00fe8 > li[data-level="2"] > button', (elements) =>
+const _menuItems = await page.$$eval('.d9b642 .d00fe8 li[data-level="2"] a, .d9b642 .d00fe8 button a', (elements) =>
     elements.map(el => el.textContent.trim())
 );
 
@@ -34,7 +34,7 @@ const testElement = await page.$('.d00fe8 > li[data-level="2"] > button');
 console.log(testElement ? 'Element gefunden' : 'NICHT gefunden');
 
 const outputDir = '../extracted_data/text';
-const outputPath = `${outputDir}/HM_menu_menu.json`;
+const outputPath = `${outputDir}/HM_menuTwo.json`;
 
 fs.mkdirSync(outputDir, { recursive: true });
 fs.writeFileSync(outputPath, JSON.stringify(dataMenu, null, 2), 'utf-8');
