@@ -12,7 +12,7 @@ const page = await browser.newPage();
 await page.goto('https://www.weekday.com/en-ww/women/'); 
 await page.waitForSelector(".relative");
 
- const _items = await page.$$eval(".flex > li >button", (elements) => { 
+ const _items = await page.$$eval(".h-fit  > .grid > .col-span-5 > ul > il > a ", (elements) => { 
   return elements.map((el) => el.textContent.trim());
 });
 
@@ -21,7 +21,7 @@ const dataItems = _items.map(item => ({
 }));
 
 
-const _menuItems = await page.$$eval('span.mb-0',  (elements) => { 
+const _menuItems = await page.$$eval('.h-fit  > .grid > div > ul > il > a ',  (elements) => { 
   return elements.map((el) => el.textContent.trim());
 });
 

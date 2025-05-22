@@ -1,57 +1,35 @@
 [
   {
-    "firstOption": {
-      "content": "NEW ARRIVALS"
-    }
+    "firstOption": "NEW ARRIVALS"
   },
   {
-    "firstOption": {
-      "content": "SHOP BY PRODUCT"
-    }
+    "firstOption": "SHOP BY PRODUCT"
   },
   {
-    "firstOption": {
-      "content": "JEANS"
-    }
+    "firstOption": "JEANS"
   },
   {
-    "firstOption": {
-      "alt": "WEEKDAY"
-    }
+    "firstOption": "WEEKDAY"
   },
   {
-    "firstOption": {
-      "alt": "MONKI"
-    }
+    "firstOption": "MONKI"
   },
   {
-    "firstOption": {
-      "alt": "CHEAP MONDAY"
-    }
+    "firstOption":  "CHEAP MONDAY"
   },
   {
-    "firstOption": {
-      "content": "NEW ARRIVALS"
-    }
+    "firstOption": "NEW ARRIVALS"
   },
   {
-    "firstOption": {
-      "content": "SHOP BY PRODUCT"
-    }
+    "firstOption": "SHOP BY PRODUCT"
   },
   {
-    "firstOption": {
-      "content": "JEANS"
-    }
+    "firstOption": "JEANS"
   },
   {
-    "firstOption": {
-      "alt": "WEEKDAY"
-    }
+    "firstOption": "WEEKDAY"
   },
   {
-    "firstOption": {
-      "alt": "CHEAP MONDAY"
-    }
+    "firstOption": "CHEAP MONDAY"
   }
 ]

@@ -6,25 +6,37 @@ import { syllable } from "syllable"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const filePath = path.join(__dirname, '../extracted_data/text/shopping_data_options.json');
+const filePath = path.join(__dirname, '../extracted_data/text/BershkaMenuOne.json');
+const filePathTwo = path.join(__dirname, '../extracted_data/text/BershkaMenuTwo.json');
+//const filePathThree = path.join(__dirname, '../extracted_data/text/weekdayTwo.json');
 
 const raw = fs.readFileSync(filePath, 'utf-8');
 const data = JSON.parse(raw);
 
-const textArray = data.map(entry => entry.title);
+const rawTwo = fs.readFileSync(filePathTwo, 'utf-8');
+const dataTwo = JSON.parse(rawTwo);
+
+/*const rawThree = fs.readFileSync(filePathThree, 'utf-8');
+const dataThree = JSON.parse(rawThree);*/
+
+const textArray = data.map(entry => entry.firstOption);
+const textArrayTwo = dataTwo.map(entry => entry.firstOption);
+//const textArrayThree = dataThree.map(entry => entry.firstOption);
+
 
 
 export function checkTextComplexity(Array) {
 
     const totalwords = countWordsinSentence(Array);
     const averageSyllables = averageSyllablesPerWord(Array);
+    const totalSentences = countSentence(Array);
 
     /*Testsyll(Array);
     console.log("TotalW: ", totalwords)
     console.log("TotalS: ", totalSentences)
     console.log("averageSyl: ", averageSyllables)*/
 
-    const averageWordsPerSentence = totalwords / 1;
+    const averageWordsPerSentence = totalSentences === 0 ? totalwords : totalwords / totalSentences;
 
     const FleschReadingEase = 206.835 - (1.015 * averageWordsPerSentence) - (84.6 * averageSyllables)
 
@@ -55,7 +67,7 @@ export function checkTextComplexity(Array) {
 
 function countWordsinSentence(Array) {
     const countedWords = Array.reduce((count, sentence) => {
-        const reduceSpecialCharacter = sentence.trim().replace(/[.,!?;:()"]/g, '');
+        const reduceSpecialCharacter = sentence.trim().replace(/[.,!?;:()"0123456789]/g, '');
         const words = reduceSpecialCharacter.split(/\s+/).filter(word => word.length > 0);
         return count + words.length
     }, 0)
@@ -64,14 +76,15 @@ function countWordsinSentence(Array) {
 }
 
 function countSentence(Array){
-    const sentenceString = /[.,!?;:()"\-]/g;
-    const countSentence = 0;
+    const sentenceString = /([!?\.]+)/g;
+    let countSentence = 0;
     Array.forEach(element => {
         const matches = element.match(sentenceString)
         if (matches){
             countSentence += matches.length
         }
     })
+    return countSentence;
 }
 
 function averageSyllablesPerWord(Array) {
@@ -79,10 +92,9 @@ function averageSyllablesPerWord(Array) {
     let allSyllables = 0;
 
     Array.forEach(sentence => {
-        const words = sentence.replace(/[.,!?;:()"]/g, '').split(/\s+/).filter(word => word.length > 0);
+        const words = sentence.replace(/[.,!?;:()0123456789"]/g, '').split(/\s+/).filter(word => word.length > 0);
         allWords.push(...words)
     })
-
 
     for (let i = 0; i < allWords.length; i++) {
         allSyllables += syllable(allWords[i]);
@@ -99,20 +111,40 @@ function averageSyllablesPerWord(Array) {
 
 }*/
 
-export function checkNumberOfIAOptions(cards) {
 
-    if (cards.length > 7) {
-        console.log("Die Anzahl der Filterauswahlmöglichkeiten liegt bei ", cards.length, " und fällt somit unter `Nicht Genügend´.")
-    } else if (cards.length === 6 || cards.length === 7) {
-        console.log("Die Anzahl der Filterauswahlmöglichkeiten liegt bei ", cards.length, " und fällt somit unter `Genügend´.")
-    } else if (cards.length === 4 || cards.length === 5) {
-        console.log("Die Anzahl der Filterauswahlmöglichkeiten liegt bei ", cards.length, " und fällt somit unter `Befriedigend.")
-    } else if (cards.length === 2 || cards.length === 3) {
-        console.log("Die Anzahl der Filterauswahlmöglichkeiten liegt bei ", cards.length, " und fällt somit unter `Gut´.")
-    } else if (cards.length === 1) {
-        console.log("Die Anzahl der Filterauswahlmöglichkeiten liegt bei ", cards.length, " und fällt somit unter `Sehr Gut´.")
+export function checkaverageInformation(firstTitle, secondTitle, menuOptions){
+
+    console.log(firstTitle.length);
+    console.log(secondTitle.length);
+    console.log(menuOptions.length);
+
+    const averageMenuTitle = firstTitle.length === 0 ? secondTitle.length : secondTitle.length / firstTitle.length;
+
+    if (averageMenuTitle > 7) {
+        console.log("Die Anzahl der Filterüberschriften pro Überauswahl liegt bei ", averageMenuTitle, " und fällt somit unter `Nicht Genügend´.")
+    } else if (averageMenuTitle > 6 || averageMenuTitle < 7) {
+        console.log("Die Anzahl der Filterüberschriften pro Überauswahl liegt bei ", averageMenuTitle, " und fällt somit unter `Genügend´.")
+    } else if (averageMenuTitle > 4 || averageMenuTitle < 5) {
+        console.log("Die Anzahl der Filterüberschriften pro Überauswahl liegt bei ", averageMenuTitle, " und fällt somit unter `Befriedigend.")
+    } else if (averageMenuTitle > 2 || averageMenuTitle < 3) {
+        console.log("Die Anzahl der Filterüberschriften pro Überauswahl liegt bei ", averageMenuTitle, " und fällt somit unter `Gut´.")
+    } else if (averageMenuTitle > 1) {
+        console.log("Die Anzahl der Filterüberschriften pro Überauswahl liegt bei ", averageMenuTitle, " und fällt somit unter `Sehr Gut´.")
+    }
+    const averageInfoNumber = secondTitle.length === 0 ? menuOptions.length : menuOptions.length / secondTitle.length;
+
+      if (averageInfoNumber > 7) {
+        console.log("Die Anzahl der Filterauswahlmöglichkeiten pro Überschrift liegt bei ", averageInfoNumber, " und fällt somit unter `Nicht Genügend´.")
+    } else if (averageInfoNumber > 6 || averageInfoNumber < 7) {
+        console.log("Die Anzahl der Filterauswahlmöglichkeiten pro Überschrift liegt bei ", averageInfoNumber, " und fällt somit unter `Genügend´.")
+    } else if (averageInfoNumber > 4 || averageInfoNumber < 5) {
+        console.log("Die Anzahl der Filterauswahlmöglichkeiten pro Überschrift liegt bei ", averageInfoNumber, " und fällt somit unter `Befriedigend.")
+    } else if (averageInfoNumber > 2 || averageInfoNumber < 3) {
+        console.log("Die Anzahl der Filterauswahlmöglichkeiten pro Überschrift liegt bei ", averageInfoNumber, " und fällt somit unter `Gut´.")
+    } else if (averageInfoNumber > 1) {
+        console.log("Die Anzahl der Filterauswahlmöglichkeiten pro Überschrift liegt bei ", averageInfoNumber, " und fällt somit unter `Sehr Gut´.")
     }
 }
 
-checkNumberOfIAOptions(textArray);
-checkTextComplexity(textArray);
+checkaverageInformation(textArray, 0, textArrayTwo)
+checkTextComplexity(textArrayTwo);
