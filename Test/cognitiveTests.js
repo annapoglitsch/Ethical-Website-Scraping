@@ -6,9 +6,11 @@ import { syllable } from "syllable"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const filePath = path.join(__dirname, '../extracted_data/text/BershkaMenuOne.json');
-const filePathTwo = path.join(__dirname, '../extracted_data/text/BershkaMenuTwo.json');
-//const filePathThree = path.join(__dirname, '../extracted_data/text/weekdayTwo.json');
+const filePath = path.join(__dirname, '../extracted_data/text/weekdayFour.json');
+const filePathTwo = path.join(__dirname, '../extracted_data/text/weekdayTwo.json');
+const filePathThree = path.join(__dirname, '../extracted_data/text/weekdayThree.json');
+const filePathFour = path.join(__dirname, '../extracted_data/text/weekdayFour.json');
+
 
 const raw = fs.readFileSync(filePath, 'utf-8');
 const data = JSON.parse(raw);
@@ -16,12 +18,12 @@ const data = JSON.parse(raw);
 const rawTwo = fs.readFileSync(filePathTwo, 'utf-8');
 const dataTwo = JSON.parse(rawTwo);
 
-/*const rawThree = fs.readFileSync(filePathThree, 'utf-8');
-const dataThree = JSON.parse(rawThree);*/
+const rawThree = fs.readFileSync(filePathThree, 'utf-8');
+const dataThree = JSON.parse(rawThree);
 
 const textArray = data.map(entry => entry.firstOption);
 const textArrayTwo = dataTwo.map(entry => entry.firstOption);
-//const textArrayThree = dataThree.map(entry => entry.firstOption);
+const textArrayThree = dataThree.map(entry => entry.firstOption);
 
 
 
@@ -146,5 +148,5 @@ export function checkaverageInformation(firstTitle, secondTitle, menuOptions){
     }
 }
 
-checkaverageInformation(textArray, 0, textArrayTwo)
-checkTextComplexity(textArrayTwo);
+checkaverageInformation(textArray, textArrayTwo, textArrayThree)
+checkTextComplexity(textArray);
