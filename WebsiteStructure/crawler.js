@@ -24,7 +24,7 @@ async function autoScroll(page) {
 }
 
 async function crawl(startUrl, maxDepth = 2) {
-  const browser = await puppeteer.launch({ headless: false }); 
+  const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
 
   const visited = new Set();
@@ -47,8 +47,8 @@ async function crawl(startUrl, maxDepth = 2) {
 
       await autoScroll(page);
       await wait(2000);
-
-      const links = await page.$$eval('a[href]', (anchors) =>
+      
+      const links = await page.$$eval(anchors =>
         anchors
           .map(a => a.href)
           .filter(href =>
@@ -71,7 +71,7 @@ async function crawl(startUrl, maxDepth = 2) {
             queue.push([url.href, depth + 1]);
           }
         } catch (err) {
-          continue; 
+          continue;
         }
       }
 
@@ -90,4 +90,4 @@ async function crawl(startUrl, maxDepth = 2) {
   console.log(`Gesamt: ${visited.size} Seiten besucht`);
 }
 
-crawl('https://www.nike.com/gb/', 3);
+crawl('https://www.weekday.com/en-ww/women/', 3);
