@@ -108,7 +108,7 @@ async function crawlPage(page, url, depth) {
   const sortedLinks = Object.entries(linkCounter)
     .map(([url, data]) => ({
       url,
-      count: data.count,
+      inboundCount: data.count,
       depth: data.depth,
       outboundCount: outboundLinks[url] ? outboundLinks[url].size : 0,
       totalHubScore: data.count + (outboundLinks[url] ? outboundLinks[url].size : 0),
@@ -124,22 +124,4 @@ async function crawlPage(page, url, depth) {
 
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function autoScroll(page) {
-  await page.evaluate(async () => {
-    await new Promise((resolve) => {
-      let totalHeight = 0;
-      const distance = 100;
-      const timer = setInterval(() => {
-        window.scrollBy(0, distance);
-        totalHeight += distance;
-
-        if (totalHeight >= document.body.scrollHeight - window.innerHeight) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, 100);
-    });
-  });
 }
