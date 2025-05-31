@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 
-const startUrl = 'https://www.nytimes.com/';
+const startUrl = 'https://www.bershka.com/';
 const maxDepth = 3;
 
 const visitedUrls = new Set();
@@ -23,27 +23,14 @@ async function crawlPage(page, url, depth) {
   urlDepthKey[url] = depth
 
   try {
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await wait(1000)
-
-    /* await autoScroll(page);
-     await wait(2000);*/
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+    await wait(2000);
 
     console.log(`current site: ${url} (depth: ${depth})`);
 
-    /* const linksArray = await page.$$eval('a', anchors =>
-       Array.from(
-         new Set(
-           anchors
-             .map(a => a.href.split('#')[0])
-             .filter(href => href && href.startsWith(window.location.origin))
-         )
-       )
-     )*/
+   const { hostname: startDomain } = new URL(startUrl);
 
-    const { hostname: startDomain } = new URL(startUrl);
-
-    const linksArray = await page.$$eval('a', (anchors) =>
+    const linksArray = await page.$$eval('a[href]', (anchors) =>
       anchors
         .map(a => a.href.split('#')[0])
         .filter(href => {
@@ -54,23 +41,8 @@ async function crawlPage(page, url, depth) {
             return false;
           }
         }),
-      startDomain
+        startDomain
     );
-
-
-    /* const linksArray = await page.$$eval('a', (anchors) =>
-       anchors
-         .map(a => a.href || a.getAttribute('href'))
-         .filter(href => href)
-     );
- 
-     const absoluteLinks = linksArray.map(link => {
-       try {
-         return new URL(link, page.url()).href;
-       } catch (e) {
-         return null;
-       }
-     }).filter(Boolean);*/
 
     if (!outboundLinks[url]) {
       outboundLinks[url] = new Set();
@@ -78,7 +50,6 @@ async function crawlPage(page, url, depth) {
     for (const link of linksArray) {
       outboundLinks[url].add(link);
     }
-
 
     const currentPathArray = new URL(url).pathname.split('/').filter(Boolean)
     const currentMain = currentPathArray[0] || '';
@@ -89,14 +60,10 @@ async function crawlPage(page, url, depth) {
         urlDepthKey[link] = depth + 1
       }
 
-
       if (!linkCounter[link]) {
         linkCounter[link] = { count: 1, depth: urlDepthKey[link] ?? depth }
       } else {
         linkCounter[link].count += 1
-        if (linkCounter[link].depth === 'unbekannt' && urlDepthKey[link]) {
-          linkCounter[link].depth = urlDepthKey[link]
-        }
       }
 
       const targetPathArray = new URL(link).pathname.split('/').filter(Boolean)
@@ -131,46 +98,47 @@ async function crawlPage(page, url, depth) {
 (async () => {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
+  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36');
+
   await crawlPage(page, startUrl, 1);
   await browser.close();
 
   const sortedLinks = Object.entries(linkCounter)
-    .sort((a, b) => b[1].count - a[1].count)
-    .map(([url, data]) => ({
-      url,
-      count: data.count,
-      depth: data.depth,
-      outboundCount: outboundLinks[url] ? outboundLinks[url].size : 0,
-    }))
+  .map(([url, data]) => ({
+    url,
+    count: data.count,
+    depth: data.depth,
+    outboundCount: outboundLinks[url] ? outboundLinks[url].size : 0,
+    totalHubScore: data.count + (outboundLinks[url] ? outboundLinks[url].size : 0),
+  }))
+  .sort((a, b) => b.totalHubScore - a.totalHubScore);
 
   console.log('\nBeliebte Hub-Seiten:');
   console.log(sortedLinks.slice(0, 20))
 
-  /* console.log('\nGefundene Shortcuts (mit Tiefen):');
-   console.log(shortcutLinksArray)*/
-
-  const filteredShortcuts = shortcutLinksArray.filter(
-    shortcut => shortcut.from.includes('/world/') || shortcut.to.includes('/world/')
+ /*const filteredShortcuts = shortcutLinksArray.filter(
+    shortcut => shortcut.from.includes('/women/') || shortcut.to.includes('/women/')
   );
 
   const fromWShortcuts = filteredShortcuts
-    .filter(shortcut => shortcut.from.includes('/world/'))
+    .filter(shortcut => shortcut.from.includes('/women/'))
     .slice(0, 10);
 
   const toWShortcuts = filteredShortcuts
-    .filter(shortcut => shortcut.to.includes('/world/'))
+    .filter(shortcut => shortcut.to.includes('/women/'))
     .slice(0, 10);
 
-  console.log('\nShortcuts FROM /world/:')
+  console.log('\nShortcuts FROM /women/:')
   console.log(fromWShortcuts)
 
-  console.log('\nShortcuts TO /world/:')
-  console.log(toWShortcuts)
+  console.log('\nShortcuts TO /women/:')*/
+  console.log(shortcutLinksArray.slice(0,50))
 })();
 
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
 async function autoScroll(page) {
   await page.evaluate(async () => {
     await new Promise((resolve) => {
