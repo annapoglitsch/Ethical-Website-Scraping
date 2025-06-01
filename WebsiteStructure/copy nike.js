@@ -4,15 +4,24 @@ const startUrl = 'https://www.nike.com';
 const maxDepth = 3;
 
 const visitedUrls = new Set();
-
 const linkCounter = {};
 const shortcutLinksArray = [];
-
 const urlDepthKey = {};
+const outboundLinks = {};
 
-const outboundLinks = {}
+
+function normalizeUrl(url) {
+  try {
+    const u = new URL(url);
+    u.hash = "";
+    return u.href.endsWith("/") ? u.href.slice(0, -1) : u.href;
+  } catch (e) {
+    return url;
+  }
+}
 
 async function crawlPage(page, url, depth) {
+  const normUrl = normalizeUrl(url);
 
   if (depth > maxDepth || visitedUrls.has(normUrl)) {
     return;
@@ -48,8 +57,8 @@ async function crawlPage(page, url, depth) {
       outboundLinks[normUrl] = new Set();
     }
 
-     for (const link of linksArray) {
-      outboundLinks[url].add(link);
+    for (const link of linksArray) {
+      outboundLinks[normUrl].add(link);
     }
     const currentPathArray = new URL(normUrl).pathname.split('/').filter(Boolean);
     const currentMain = currentPathArray[0] || '';
@@ -74,7 +83,10 @@ async function crawlPage(page, url, depth) {
       const isHomepage = targetPathArray.length === 0;
       const isFromHomepage = currentPathArray.length === 0;
 
-      const isShortcut = !isFromHomepage && !isSameRoot && !isHomepage;
+      const isShortcut =
+        !isFromHomepage &&
+        !isSameRoot &&
+        !isHomepage;
 
       if (isShortcut) {
         shortcutLinksArray.push({
@@ -100,7 +112,7 @@ async function crawlPage(page, url, depth) {
 (async () => {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
-  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36');
+ // await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36');
 
   await crawlPage(page, startUrl, 1);
   await browser.close();
@@ -118,7 +130,6 @@ async function crawlPage(page, url, depth) {
   console.log('\nBeliebte Hub-Seiten:');
   console.log(sortedLinks.slice(0, 20));
 
-  // Shortcuts
   console.log(shortcutLinksArray.slice(0, 50));
 })();
 
